@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "tab-player-backend"
+version = "0.1.0"
+description = "FastApi backend that recieves text and returns midi based on. git@github.com:Sarath18/guitar-tabs-to-MIDI.git"
+authors = ["Frederic Marvin Abraham <mail@fabraham.dev>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+fastapi = "^0.106.0"
+uvicorn = {extras = ["standard"], version = "^0.25.0"}
+midiutil = "^1.2.1"
+midi2audio = "^0.1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

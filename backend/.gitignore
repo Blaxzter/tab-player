@@ -1,0 +1,9 @@
+*.mid
+*.pyc
+*.png
+*.jpg
+*.gif
+
+.idea
+.env
+/midi_font/sound_font.sf2
