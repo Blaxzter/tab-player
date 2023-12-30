@@ -5,13 +5,27 @@ import tempfile
 from fastapi import FastAPI
 from fastapi.exceptions import HTTPException
 from midi2audio import FluidSynth
+from starlette.middleware.cors import CORSMiddleware
 from starlette.responses import StreamingResponse
 
 from src.guitartabstomidi.midi_generator import Track
 from src.guitartabstomidi.read_tabs import Tabs
+from src.preprocess import pre_process_guitar_tabs
 from src.schemas import CreateMidiRequest
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "*"
+    ],  # [str(origin) for origin in config.settings.BACKEND_CORS_ORIGINS],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["x-error"],
+)
+
 
 
 @app.post("/generate_midi")
@@ -58,16 +72,20 @@ async def generate_audio(
 
     return StreamingResponse(mp3_generator(), headers = {
         'Content-Disposition': 'attachment; filename="output.mp3"'
-    }, media_type = "audio/mpeg")
+    }, media_type = "audio/mp3")
 
 
-async def create_midi_tack(create_midi_request):
+async def create_midi_tack(create_midi_request: CreateMidiRequest):
     tab = create_midi_request.tab
+    
+    preprocessed_tab, repeated_blocks = pre_process_guitar_tabs(tab, create_midi_request.lines_per_tab)
+    
     # check if tab is valid
-    if tab is None or len(tab) == 0 or len(tab.splitlines()) != 6:
+    if preprocessed_tab is None or len(preprocessed_tab) == 0 or len(preprocessed_tab) != create_midi_request.lines_per_tab:
         raise HTTPException(status_code = 400, detail = "Invalid tab")
+    
     tempo = create_midi_request.tempo
-    t = Tabs(tab)
+    t = Tabs(preprocessed_tab)
     t.preprocess()
     if create_midi_request.verbose:
         t.displayTabs()

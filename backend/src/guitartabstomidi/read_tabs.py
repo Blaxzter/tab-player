@@ -10,7 +10,7 @@ class Tabs(object):
 
     def preprocess(self):
 
-        content = [x.strip() for x in self.tab.splitlines()]
+        content = [x.strip() for x in self.tab]
 
         for symbol in self.symbols:
             for i, line in enumerate(content):
